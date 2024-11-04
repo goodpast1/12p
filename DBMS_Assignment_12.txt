@@ -1,0 +1,115 @@
+Assignment No :-  12
+Name : Onkar Dhanaji Patil
+Roll No.: 31157
+----------------------------------------------------------------------
+
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import org.bson.Document;
+import java.util.Scanner;
+
+public class InvoiceMongo {
+    public static void main(String[] args) {
+        try {
+            MongoClient mclient = new MongoClient(new MongoClientURI("mongodb://te31157:te31157@10.10.13.97:27017/te31157_db"));
+            MongoDatabase db = mclient.getDatabase("te31157_db");
+            MongoCollection<Document> col = db.getCollection("Invoice");
+
+            Scanner sc = new Scanner(System.in);
+            int choice, invoiceId, custId, productId, quantity;
+            double price;
+            String date;
+
+            while (true) {
+                System.out.println("1. Insert\n2. Delete\n3. Update\n4. Display\n5. Exit");
+                System.out.println("Enter choice: ");
+                choice = sc.nextInt();
+
+                switch (choice) {
+                    case 1:
+                        System.out.println("Invoice ID: ");
+                        invoiceId = sc.nextInt();
+                        System.out.println("Customer ID: ");
+                        custId = sc.nextInt();
+                        System.out.println("Product ID: ");
+                        productId = sc.nextInt();
+                        System.out.println("Quantity: ");
+                        quantity = sc.nextInt();
+                        System.out.println("Price: ");
+                        price = sc.nextDouble();
+                        System.out.println("Date (YYYY-MM-DD): ");
+                        sc.nextLine();
+                        date = sc.nextLine();
+
+                        Document doc = new Document();
+                        doc.append("invoice_id", invoiceId);
+                        doc.append("cust_id", custId);
+                        doc.append("product_id", productId);
+                        doc.append("quantity", quantity);
+                        doc.append("price", price);
+                        doc.append("date", date);
+
+                        col.insertOne(doc);
+                        System.out.println("Invoice inserted successfully!\n");
+                        break;
+
+                    case 2:
+                        System.out.println("Invoice ID to delete: ");
+                        invoiceId = sc.nextInt();
+                        col.deleteOne(Filters.eq("invoice_id", invoiceId));
+                        System.out.println("Invoice deleted successfully!\n");
+                        break;
+
+                    case 3:
+                        System.out.println("Invoice ID to update: ");
+                        invoiceId = sc.nextInt();
+                        System.out.println("Updated Customer ID: ");
+                        custId = sc.nextInt();
+                        System.out.println("Updated Product ID: ");
+                        productId = sc.nextInt();
+                        System.out.println("Updated Quantity: ");
+                        quantity = sc.nextInt();
+                        System.out.println("Updated Price: ");
+                        price = sc.nextDouble();
+                        System.out.println("Updated Date (YYYY-MM-DD): ");
+                        sc.nextLine();
+                        date = sc.nextLine();
+
+                        Document updatedDoc = new Document();
+                        updatedDoc.append("invoice_id", invoiceId);
+                        updatedDoc.append("cust_id", custId);
+                        updatedDoc.append("product_id", productId);
+                        updatedDoc.append("quantity", quantity);
+                        updatedDoc.append("price", price);
+                        updatedDoc.append("date", date);
+
+                        col.replaceOne(Filters.eq("invoice_id", invoiceId), updatedDoc);
+                        System.out.println("Invoice updated successfully!\n");
+                        break;
+
+                    case 4:
+                        System.out.println("Displaying all invoices:");
+                        for (Document docInvoice : col.find()) {
+                            System.out.println(docInvoice.toJson());
+                        }
+                        break;
+
+                    case 5:
+                        System.out.println("Exiting...");
+                        mclient.close();
+                        sc.close();
+                        System.exit(0);
+
+                    default:
+                        System.out.println("Invalid choice, please try again.\n");
+                        break;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+}
